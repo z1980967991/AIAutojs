@@ -1,5 +1,3 @@
-const { clickObj, log } = require("./utils.js");
-
 
 const getNowPage = () => {
     let nowPage = '';
@@ -27,7 +25,7 @@ const getNowPage = () => {
             break
         }
     }
-    log("当前页面：" + nowPage)
+    console.log("当前页面：" + nowPage)
     return nowPage
 }
 
@@ -35,7 +33,7 @@ const login = (name, pwd) => {
     setText(0, "")
     input(1, "")
     setText(0, "")
-    log("进入登录页面，输入账号密码")
+    console.log("进入登录页面，输入账号密码")
     setText(0, name);
     sleep(200)
     setText(1, pwd);
@@ -43,8 +41,19 @@ const login = (name, pwd) => {
     click("登 录");
 }
 
+const clickObj = (obj) => {
+    const x1 = obj.bounds().left
+    const x2 = obj.bounds().right
+    const x = ((x2 - x1) / 2) + x1
+    const y1 = obj.bounds().bottom
+    const y2 = obj.bounds().top
+    const y = ((y1 - y2) / 2) + y2
+    click(x, y + 5)
+    sleep(500)
+}
+
 const completeFrom = () => {
-    log("填写缺陷信息")
+    console.log("填写缺陷信息")
     const preSubmitData = {
         source: '巡视（人巡）',
         deviceType: '站房',
@@ -55,9 +64,9 @@ const completeFrom = () => {
         questionDesc: '这里是输入的缺陷描述',
         handleWay: '运维处理',
     }
-    log("填写缺陷信息")
+    console.log("填写缺陷信息")
 
-    log('填写来源:' + preSubmitData.source)
+    console.log('填写来源:' + preSubmitData.source)
     // 选择来源 来源和实际不一样
     if (!textContains('来源').findOne().text().includes(preSubmitData.source)) {
         clickObj(textContains('来源').findOne())
@@ -65,9 +74,9 @@ const completeFrom = () => {
         clickObj(textContains(preSubmitData.source).findOne())
         sleep(500)
     } else {
-        log('来源和目标一致')
+        console.log('来源和目标一致')
     }
-    log('选择设备类型:' + preSubmitData.deviceType)
+    console.log('选择设备类型:' + preSubmitData.deviceType)
     // 选择设备类型
     click(preSubmitData.deviceType)
     sleep(1000)
@@ -81,7 +90,7 @@ const completeFrom = () => {
     // sleep(500)
     // clickObj(text('搜索').findOne())
     sleep(1000)
-    log('选择设备名称:' + preSubmitData.deviceName)
+    console.log('选择设备名称:' + preSubmitData.deviceName)
     if (preSubmitData.deviceType === '线路') {
         className("android.widget.EditText").depth(12).drawingOrder(0).indexInParent(0).findOne().setText(preSubmitData.deviceName);
     }
@@ -92,13 +101,13 @@ const completeFrom = () => {
     clickObj(text('搜索').findOne())
     sleep(1000)
     while (textContains('加载中').exists()) {
-        log('加载中')
+        console.log('加载中')
         sleep(2000)
     }
     clickObj(textContains(preSubmitData.deviceName).findOnce(1))
     sleep(500)
     if (preSubmitData.line !== '' && preSubmitData.deviceType !== '站房') {
-        log('选择线路')
+        console.log('选择线路')
         clickObj(textContains(preSubmitData.line).findOne())
         sleep(500)
     }
@@ -106,10 +115,10 @@ const completeFrom = () => {
         clickObj(textContains('确认').findOne())
     }
     sleep(2000)
-    log("设备选择完毕")
+    console.log("设备选择完毕")
 
     // 选择问题类型
-    log('选择问题类型：' + preSubmitData.questionType)
+    console.log('选择问题类型：' + preSubmitData.questionType)
     textContains('问题类型').findOne().click()
     sleep(500)
     clickObj(text(preSubmitData.questionType.split("-")[0]).findOne())
@@ -118,7 +127,7 @@ const completeFrom = () => {
     sleep(1000)
     clickObj(text(preSubmitData.questionType.split("-")[2]).findOne())
     sleep(1000)
-    log("问题类型完毕")
+    console.log("问题类型完毕")
 
     if (preSubmitData.deviceType === '线路' && preSubmitData.tower) {
         // 选择杆塔
@@ -126,12 +135,12 @@ const completeFrom = () => {
         sleep(1000)
     }
 
-    log('问题描述：' + preSubmitData.questionType)
+    console.log('问题描述：' + preSubmitData.questionType)
     // 输入问题类型
     setText(0, preSubmitData.questionDesc)
     sleep(500)
-    log('问题描述输入完毕')
-    log('准备拍摄图片')
+    console.log('问题描述输入完毕')
+    console.log('准备拍摄图片')
     // 输入图片
     clickObj(className('android.widget.TextView').depth(9).drawingOrder(0).indexInParent(0).findOnce(1))
     sleep(1000)
@@ -143,35 +152,33 @@ const completeFrom = () => {
     toast('选择照片')
     clickObj(desc('确定').id('done_button').findOne())
     sleep(5000)
-    log('批注')
+    console.log('批注')
     gesture(500, [300, 1000], [800, 1700])
     sleep(500)
     clickObj(text('完成').findOnce())
     sleep(2000)
     while (textContains('加载中').exists()) {
-        log('加载中')
+        console.log('加载中')
         sleep(2000)
     }
-    log('选择处理方式：' + preSubmitData.handleWay)
+    console.log('选择处理方式：' + preSubmitData.handleWay)
     // 选择处理方式
     clickObj(textContains(preSubmitData.handleWay).findOne())
     sleep(500)
-    log('处理方式选择完毕')
+    console.log('处理方式选择完毕')
     sleep(1000)
     alert('表单填写完成:' + JSON.stringify(preSubmitData))
 }
 
 const questionScript = () => {
-    log('开始运行，启动app')
     launchApp("运检e助手");
     let page = getNowPage()
     if (page === "登录页") {
-        log('登录账号13909690170')
         login("13909690170", "rpa@1234")
         textContains("消息").waitFor();
         textContains("首页").waitFor();
         textContains("我的").waitFor();
-        log("进入首页")
+        console.log("进入首页")
     }
     page = getNowPage()
     if (page === "首页") {
@@ -190,13 +197,10 @@ const questionScript = () => {
     click("缺陷隐患")
     className("android.view.View").depth(10).drawingOrder(0).indexInParent(1).waitFor();
     sleep(500)
-    log("添加缺陷隐患")
+    console.log("添加缺陷隐患")
     clickObj(className("android.view.View").depth(10).drawingOrder(0).indexInParent(1).findOne())
     sleep(2000)
     completeFrom()
 
 }
 
-module.exports = {
-    questionScript
-}
