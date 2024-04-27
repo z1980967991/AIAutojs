@@ -14,8 +14,6 @@ const Request = Packages.okhttp3.Request;
 const appId = "7a3bf92a";
 const secretKey = "79bc13e566ccff70c1cd7cb925dd39ed";
 
-isInitLogger = false;
-
 function MD5(strInfo) {
   try {
     // 得到一个信息摘要器
@@ -92,39 +90,6 @@ function checkPermission() {
   }
 }
 
-function message(text, isNotClose, time) {
-  floaty.closeAll();
-  const window = floaty.rawWindow(
-    <frame gravity="center">
-      <vertical
-        gravity="center"
-        bg="#AA000000"
-        w="200"
-        h="auto"
-        marginTop="-50"
-        minHeight="60"
-      >
-        <text
-          id="text"
-          textSize="20sp"
-          textColor="#FFFFFF"
-          gravity="center"
-          singleLine="false"
-        />
-      </vertical>
-    </frame>
-  );
-  window.setSize(device.width, device.height);
-  window.setTouchable(true);
-  window.text.setText(text);
-  console.log("message:", text);
-  if (!isNotClose) {
-    setTimeout(() => {
-      window.close();
-    }, time || 1500);
-  }
-}
-
 const xFSign = () => {
   const ts = new Date().getTime();
   const baseString = appId + ts;
@@ -137,6 +102,7 @@ const xFSign = () => {
 
 const httpInputStream = (url, filePath, fileLength) => {
   try {
+    // console.log("上传文件流", url, filePath, fileLength);
     const fileInputStream = new java.io.FileInputStream(filePath);
     const buffer = java.lang.reflect.Array.newInstance(
       java.lang.Byte.TYPE,
@@ -148,17 +114,17 @@ const httpInputStream = (url, filePath, fileLength) => {
       MediaType.parse("application/octet-stream"),
       buffer
     );
+    fileInputStream.close();
     const request = new Request.Builder().url(url).post(requestBody).build();
     // // 发起请求
     const response = client.newCall(request).execute();
-    fileInputStream.close();
     const result = JSON.parse(response.body().string());
     return result;
   } catch (error) {
-    console.log('上传文件流失败' + error);
-    return {}
+    console.log("上传文件流失败" + error);
+    return {};
   }
-}
+};
 
 const getXfJsonResult = (result) => {
   let recognitionResult = "";
@@ -168,12 +134,18 @@ const getXfJsonResult = (result) => {
       let lattice = latticeArray[i];
       if (lattice && lattice.json_1best) {
         let json1best = JSON.parse(lattice.json_1best);
-        if (json1best && json1best.st && json1best.st.rt && json1best.st.rt.length > 0) {
+        if (
+          json1best &&
+          json1best.st &&
+          json1best.st.rt &&
+          json1best.st.rt.length > 0
+        ) {
           recognitionResult += json1best.st.rt.reduce((acc, rt) => {
             if (rt.ws) {
-              rt.ws.forEach(ws => {
+              rt.ws.forEach((ws) => {
                 if (ws.cw) {
-                  ws.cw.forEach(cw => {
+                  ws.cw.forEach((cw) => {
+                    //&& cw.wp !== "p"
                     if (cw.w) {
                       acc += cw.w;
                     }
@@ -192,71 +164,24 @@ const getXfJsonResult = (result) => {
     }
   }
   return recognitionResult.trim() || "无法提取识别结果";
-}
-
-function initLogger() {
-  window = floaty.rawWindow(
-    <frame padding="2" alpha="0.7" bg="#505050" w="*">
-      <vertical >
-        <ScrollView id="As" h="*" w="*">
-          <text id="Alog" textSize="14sp" textColor="#28FF28" margin="1">日志输出</text>
-        </ScrollView>
-      </vertical>
-    </frame>
-  );
-  window.setSize(device.width / 2, 500)
-  window.setPosition(0, 0)
-  window.setTouchable(false)
-  isInitLogger = true
-}
-function showLogger() {
-  window.setSize(0, 0)
-}
-function hideLogger() {
-  window.setSize(500, 500)
-}
-
-function log(text) {
-  if (!isInitLogger) {
-    initLogger()
-  }
-  if (text instanceof Object) {
-    text = JSON.stringify(text)
-  }
-  console.log(text)
-
-  ui.run(function () {
-    window.Alog.append("\n" + text);
-    //    window.As.scrollTo(0, window.Alog.getHeight());
-  }
-  );
-  ui.run(function () {
-    // window.Alog.append("\n"+日志);
-    window.As.scrollTo(0, window.Alog.getHeight());
-  }
-  );
-}
+};
 
 const clickObj = (obj) => {
-  const x1 = obj.bounds().left
-  const x2 = obj.bounds().right
-  const x = ((x2 - x1) / 2) + x1
-  const y1 = obj.bounds().bottom
-  const y2 = obj.bounds().top
-  const y = ((y1 - y2) / 2) + y2
-  click(x, y + 5)
-  sleep(500)
-}
+  const x1 = obj.bounds().left;
+  const x2 = obj.bounds().right;
+  const x = (x2 - x1) / 2 + x1;
+  const y1 = obj.bounds().bottom;
+  const y2 = obj.bounds().top;
+  const y = (y1 - y2) / 2 + y2;
+  click(x, y + 5);
+  sleep(500);
+};
 
 module.exports = {
   checkPermission,
   recorder,
-  message,
   xFSign,
   httpInputStream,
   getXfJsonResult,
-  log,
-  hideLogger,
-  showLogger,
-  clickObj
+  clickObj,
 };
