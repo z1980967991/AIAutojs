@@ -157,8 +157,6 @@ const homePage = () => {
       </vertical>
     </vertical>
   );
-
-  const axios = require("axios");
   const {
     recorder,
     checkPermission,
@@ -168,7 +166,7 @@ const homePage = () => {
   } = require("./utils.js");
   const { questionScript } = require("./script.js");
   const { message } = require("./messager.js");
-
+  runtime.requestPermissions(["record_audio"]);
   const axiosPost = () => {
     message("AI大模型识别中...");
     let signData = xFSign();
