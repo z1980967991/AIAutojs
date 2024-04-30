@@ -7,6 +7,9 @@ if (qiqi.get("userName") == undefined) {
 if (qiqi.get("password") == undefined) {
   qiqi.put("password", "");
 }
+if (qiqi.get("authCode") == undefined) {
+  qiqi.put("authCode", "");
+}
 const setting = () => {
   ui.layout(
     <vertical w="*" h="*">
@@ -28,6 +31,34 @@ const setting = () => {
           />
         </toolbar>
       </appbar>
+      <vertical h="auto" padding="12">
+        <horizontal h="auto" w="*">
+          <text
+            text="授权配置："
+            textColor="black"
+            textSize="15sp"
+            marginTop="1"
+            w="auto"
+          />
+        </horizontal>
+        <horizontal h="auto" w="*">
+          <text
+            text="授权码："
+            textColor="black"
+            textSize="15sp"
+            marginTop="1"
+            w="auto"
+          />
+          <input
+            id="authCode"
+            layout_weight="1"
+            text=""
+            gravity="left"
+            textSize="15sp"
+            width="100px"
+          />
+        </horizontal>
+      </vertical>
       <vertical h="*" padding="12">
         <horizontal h="auto" w="*">
           <text
@@ -49,7 +80,7 @@ const setting = () => {
           <input
             id="userName"
             layout_weight="1"
-            text="10"
+            text=""
             gravity="left"
             textSize="15sp"
             width="100px"
@@ -65,7 +96,7 @@ const setting = () => {
           />
           <input
             id="password"
-            text="10"
+            text=""
             layout_weight="1"
             gravity="left"
             textSize="15sp"
